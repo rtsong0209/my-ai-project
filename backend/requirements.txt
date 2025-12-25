@@ -8,3 +8,8 @@ python-dotenv
 aiofiles
 openai
 python-docx
+beautifulsoup4
+pdfplumber
+sqlalchemy
+pydantic
+aiofiles
