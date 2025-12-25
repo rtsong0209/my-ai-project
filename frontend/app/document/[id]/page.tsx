@@ -68,10 +68,14 @@ export default function DocumentDetail() {
   const [chatLoading, setChatLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 🌟【关键修改】自动获取 API 地址
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   // 1. 获取文章详情
   useEffect(() => {
     if (!id) return;
-    fetch(`http://127.0.0.1:8000/api/documents/${id}`)
+    // 🌟【关键修改】使用变量替换死地址
+    fetch(`${API_BASE_URL}/api/documents/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not Found");
         return res.json();
@@ -82,7 +86,7 @@ export default function DocumentDetail() {
       })
       .catch((e) => console.error("加载失败", e))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, API_BASE_URL]); // 添加 API_BASE_URL 依赖
 
   // 2. 自动滚动
   useEffect(() => {
@@ -98,7 +102,8 @@ export default function DocumentDetail() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/documents/${id}`, {
+      // 🌟【关键修改】使用变量替换死地址
+      const res = await fetch(`${API_BASE_URL}/api/documents/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...doc, content: editContent }),
@@ -133,7 +138,8 @@ export default function DocumentDetail() {
     setChatLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/chat", {
+      // 🌟【关键修改】使用变量替换死地址
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

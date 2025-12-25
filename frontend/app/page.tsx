@@ -34,6 +34,10 @@ export default function Home() {
   const [activeTheme, setActiveTheme] = useState(""); 
   const [inputText, setInputText] = useState("");
 
+  // 🌟【关键修改】自动获取 API 地址
+  // 如果 Vercel 里填了环境变量就用线上的，否则用本地的
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   useEffect(() => {
     fetchMaterials();
   }, [searchQuery, activeType, activeTheme]);
@@ -46,7 +50,8 @@ export default function Home() {
       if (activeType && activeType !== "全部素材") params.append("type", activeType);
       if (activeTheme) params.append("theme", activeTheme); 
 
-      const res = await fetch(`http://127.0.0.1:8000/api/documents?${params.toString()}`);
+      // 🌟【关键修改】使用变量替换死地址
+      const res = await fetch(`${API_BASE_URL}/api/documents?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setMaterials(Array.isArray(data) ? data : []);
@@ -65,9 +70,11 @@ export default function Home() {
       if (payload instanceof File) {
         const formData = new FormData();
         formData.append("file", payload);
-        res = await fetch("http://127.0.0.1:8000/api/upload", { method: "POST", body: formData });
+        // 🌟【关键修改】使用变量替换死地址
+        res = await fetch(`${API_BASE_URL}/api/upload`, { method: "POST", body: formData });
       } else {
-        res = await fetch("http://127.0.0.1:8000/api/upload/text", {
+        // 🌟【关键修改】使用变量替换死地址
+        res = await fetch(`${API_BASE_URL}/api/upload/text`, {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: payload, type: "text" }),
         });
@@ -80,7 +87,8 @@ export default function Home() {
     e.preventDefault(); 
     e.stopPropagation();
     if (!confirm("确定要删除这条素材吗？")) return;
-    await fetch(`http://127.0.0.1:8000/api/documents/${id}`, { method: "DELETE" });
+    // 🌟【关键修改】使用变量替换死地址
+    await fetch(`${API_BASE_URL}/api/documents/${id}`, { method: "DELETE" });
     fetchMaterials();
   };
 
@@ -156,9 +164,6 @@ export default function Home() {
           <div className="flex items-center gap-8 flex-1">
              {/* Logo 区域 */}
              <Link href="/" className="block cursor-pointer select-none shrink-0">
-               {/* height={50} 与 header 高度 h-20 (80px) 搭配很合适
-                  bg-white 的环境会让你的白底 jpg Logo 完美融合
-               */}
                <Image 
                  src="/logo.png" 
                  alt="智笔素材 Logo" 
